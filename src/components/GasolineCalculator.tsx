@@ -27,7 +27,7 @@ const GasolineCalculator = () => {
       <h2>Calculadora de Gasolina</h2>
       <div className={styles.inputContainer}>
         <label className={styles.label}>
-          Quilômetros por Litro:
+          KM / Litro
           <input
             type="number"
             value={kmPerLiter}
@@ -38,7 +38,7 @@ const GasolineCalculator = () => {
       </div>
       <div className={styles.inputContainer}>
         <label className={styles.label}>
-          Preço da Gasolina por Litro:
+          Gasolina Preço por Litro (R$):
           <input
             type="number"
             value={gasPrice}
