@@ -5,7 +5,7 @@ const GasolineCalculator = () => {
   const [kmPerLiter, setKmPerLiter] = useState('');
   const [gasPrice, setGasPrice] = useState('');
   const [distance, setDistance] = useState('');
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState(0);
 
   const calculateGasCost = () => {
     const km = parseFloat(kmPerLiter);
@@ -14,7 +14,7 @@ const GasolineCalculator = () => {
 
     if (!isNaN(km) && !isNaN(price) && !isNaN(dist)) {
       const cost = (dist / km) * price;
-      setResult(cost.toFixed(2));
+      setResult(Number(cost.toFixed(2)));
     }
   };
 
