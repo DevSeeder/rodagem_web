@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from '../styles/GasolineCalculator.module.css';
+import Head from 'next/head';
 
 const GasolineCalculator = () => {
   const [kmPerLiter, setKmPerLiter] = useState('');
