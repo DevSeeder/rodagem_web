@@ -25,7 +25,7 @@ const GasolineCalculator = () => {
 
   return (
     <div className={styles.container}>
-      <h2>Calculadora de Gasolina</h2>
+      <h2>Rodagem - Calculadora de Gasolina</h2>
       <div className={styles.inputContainer}>
         <label className={styles.label}>
           KM / Litro
