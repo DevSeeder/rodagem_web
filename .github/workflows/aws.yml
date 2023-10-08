@@ -20,15 +20,17 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /var/www/instances/rodagem_web
-            
+
+            sudo su
+
             pm2 stop rodagem_web
-            
+
             git checkout .
             git checkout master
             git pull
-            
+
             npm install
             npm run build
-            
+
             pm2 start rodagem_web
             pm2 save
