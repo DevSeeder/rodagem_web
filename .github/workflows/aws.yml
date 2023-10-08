@@ -21,8 +21,6 @@ jobs:
           script: |
             cd /var/www/instances/rodagem_web
 
-            sudo su
-
             pm2 stop rodagem_web
 
             git checkout .
