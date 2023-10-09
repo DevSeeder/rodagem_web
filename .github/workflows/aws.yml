@@ -30,8 +30,8 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > pure_private_key.pem
-          tail -c +4 pure_private_key.pem > private_key.pem
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          tail -c +4 private_key.pem > clean_private_key.pem
           chmod 600 private_key.pem
           ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
@@ -47,7 +47,7 @@ jobs:
           eval "$(ssh-agent -s)"
           echo "ssh age"
 
-          ssh-add pure_private_key.pem
+          ssh-add private_key.pem
           echo "ssh-add"
 
 
