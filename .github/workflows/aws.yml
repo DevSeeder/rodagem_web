@@ -20,7 +20,7 @@ jobs:
 
           SSH_HOST=$(echo $secret_value | jq -r '.HOST_DNS')
           SSH_USERNAME=$(echo $secret_value | jq -r '.USERNAME')
-          SSH_PRIVATE_KEY=$(echo $secret_value | jq -r '.CLEAN_SSH_KEY')
+          SSH_PRIVATE_KEY=$(echo $secret_value | jq -r '.EC2_SSH_KEY')
 
           echo "SSH_HOST=$SSH_HOST" >> "$GITHUB_ENV"
           echo "SSH_USERNAME=$SSH_USERNAME" >> "$GITHUB_ENV"
