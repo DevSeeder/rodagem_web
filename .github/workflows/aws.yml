@@ -30,6 +30,8 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
+          echo "O diretório atual é $GITHUB_WORKSPACE"
+
           echo "$SSH_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
           ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
@@ -44,7 +46,9 @@ jobs:
 
           eval "$(ssh-agent -s)"
           echo "ssh age"
-          ls
+
+          echo "O diretório atual é $GITHUB_WORKSPACE"
+
           ssh-add private_key.pem
           echo "ssh-add"
 
