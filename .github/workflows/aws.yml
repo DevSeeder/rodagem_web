@@ -32,7 +32,7 @@ jobs:
         run: echo ${{ env.SSH_PRIVATE_KEY }}
 
       - name: Executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@latest
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ env.SSH_HOST }}
           username: ${{ env.SSH_USERNAME }}
