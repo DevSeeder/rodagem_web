@@ -30,7 +30,6 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "O diretório atual é $GITHUB_WORKSPACE"
 
           echo "$SSH_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
@@ -45,12 +44,12 @@ jobs:
           echo "permissao"
 
           eval "$(ssh-agent -s)"
-          echo "ssh age"
+          echo "ssh-age"
 
-          echo "O diretório atual é $GITHUB_WORKSPACE"
+          set -x  # Ativa o modo de depuração
 
           ssh-add private_key.pem
-          echo "ssh-add"
+          echo "ssh-asdd"
 
 
           ssh -i private_key.pem $SSH_USERNAME@$SSH_HOST "ls -l"
