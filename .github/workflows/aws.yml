@@ -39,13 +39,15 @@ jobs:
         run: |
           echo $SSH_HOST
           echo $SSH_USERNAME
-          echo $SSH_PRIVATE_KEY
+          # echo $SSH_PRIVATE_KEY
+
+          cat private_key.pem
+
 
           chmod 600 private_key.pem
           eval `ssh-agent -s`
           ssh-add private_key.pem
 
-          cat private_key.pem
 
           ssh -i private_key.pem $SSH_USERNAME@$SSH_HOST "ls -l"
 
