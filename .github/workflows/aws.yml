@@ -58,7 +58,7 @@ jobs:
 
           echo "ssh i"
 
-          echo "----> ${{ secrets.TARGET_DIR }}" | base64 --encode | base64 --decode;
+          echo "----> ${{ secrets.TARGET_DIR }}" | base64 | base64 --decode;
           cd /var/www/instances/rodagem_web
 
           pm2 stop ${{ secrets.TARGET_DIR }}
