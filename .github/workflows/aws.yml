@@ -34,32 +34,32 @@ jobs:
 
       - name: Set up SSH
         run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+
+      - name: Execute SSH Command
+        run: |
           echo $SSH_HOST
           echo $SSH_USERNAME
           echo $SSH_PRIVATE_KEY
 
-          # mkdir -p ~/.ssh
-          # echo "$SSH_PRIVATE_KEY" > private_key.pem
-          # chmod 600 private_key.pem
-          # ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+          chmod 777 private_key.pem
+          ssh-add private_key.pem
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+          ssh -i private_key.pem $SSH_USERNAME@$SSH_HOST "ls -l"
 
-      - name: Executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@v0.1.9
-        with:
-          host: $SSH_HOST
-          username: $SSH_USERNAME
-          key: $SSH_PRIVATE_KEY
-          script: |
-            cd /var/www/instances/${{ secrets.TARGET_DIR }}
+          cd /var/www/instances/${{ secrets.TARGET_DIR }}
 
-            pm2 stop ${{ secrets.TARGET_DIR }}
+          pm2 stop ${{ secrets.TARGET_DIR }}
 
-            sudo git checkout .
-            sudo git checkout master
-            sudo git pull
+          sudo git checkout .
+          sudo git checkout master
+          sudo git pull
 
-            sudo npm install
-            sudo npm run build
+          sudo npm install
+          sudo npm run build
 
-            pm2 start ${{ secrets.TARGET_DIR }}
-            pm2 save
+          pm2 start ${{ secrets.TARGET_DIR }}
+          pm2 save
