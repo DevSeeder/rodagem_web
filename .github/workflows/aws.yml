@@ -44,10 +44,10 @@ jobs:
           chmod 600 private_key.pem
           echo "permissao"
 
-          eval `ssh-agent -s`
+          eval "$(ssh-agent -s)"
           echo "ssh age"
 
-          # ssh-add private_key.pem
+          ssh-add private_key.pem
           echo "ssh-add"
 
 
