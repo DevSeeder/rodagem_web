@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Add AWS CLI to PATH
+      - name: Add AWS CLI to PATH
         run: echo 'export PATH=$PATH:/usr/local/bin' >> $GITHUB_ENV
       - name: Set up AWS CLI
         run: |
