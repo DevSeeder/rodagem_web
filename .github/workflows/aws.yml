@@ -31,8 +31,8 @@ jobs:
         uses: appleboy/ssh-action@v0.1.9
         with:
           host: $SSH_HOST
-          username: $USERNAME
-          key: $EC2_SSH_KEY
+          username: $SSH_USERNAME
+          key: $SSH_PRIVATE_KEY
           script: |
 
             host=$(echo $secret_value | jq -r '.HOST_DNS')
