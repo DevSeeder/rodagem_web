@@ -12,16 +12,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up AWS CLI
+        run: |
+          echo ${{ secrets.AWS_ACCESS_KEY_ID }} > aws_access_key_id
+          echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} > aws_secret_access_key
+          aws configure set aws_access_key_id $(cat aws_access_key_id)
+          aws configure set aws_secret_access_key $(cat aws_secret_access_key)
+
+      - name: Get SSH Secrets
+        run: |
+          secret_value=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.SERVER_SECRET_NAME }} --region ${{ secrets.AWS_REGION }} --query SecretString --output text)
+
+          export SSH_HOST=host=$(echo $secret_value | jq -r '.HOST_DNS')
+          export SSH_USERNAME=host=$(echo $secret_value | jq -r '.USERNAME')
+          export SSH_PRIVATE_KEY=host=$(echo $secret_value | jq -r '.EC2_SSH_KEY')
+
       - name: Executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@v0.1.9
         with:
-          host: ${{ secrets.HOST_DNS }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          host: $SSH_HOST
+          username: $USERNAME
+          key: $EC2_SSH_KEY
           script: |
-            cd /var/www/instances/rodagem_web
 
-            pm2 stop rodagem_web
+            host=$(echo $secret_value | jq -r '.HOST_DNS')
+            username=$(echo $secret_value | jq -r '.USERNAME')
+            ssh_key=$(echo $secret_value | jq -r '.EC2_SSH_KEY')
+
+            cd /var/www/instances/${{ secrets.TARGET_DIR }}
+
+            pm2 stop ${{ secrets.TARGET_DIR }}
 
             sudo git checkout .
             sudo git checkout master
@@ -30,25 +50,5 @@ jobs:
             sudo npm install
             sudo npm run build
 
-            pm2 start rodagem_web
+            pm2 start ${{ secrets.TARGET_DIR }}
             pm2 save
-
-      - name: Set up AWS CLI
-        run: |
-          echo ${{ secrets.AWS_ACCESS_KEY_ID }} > aws_access_key_id
-          echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} > aws_secret_access_key
-          aws configure set aws_access_key_id $(cat aws_access_key_id)
-          aws configure set aws_secret_access_key $(cat aws_secret_access_key)
-
-      - name: Access AWS Secret Manager
-        run: |
-          secret_value=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.SERVER_SECRET_NAME }} --region ${{ secrets.AWS_REGION }} --query SecretString --output text)
-          echo "Secret Value: $secret_value"
-
-          # Use jq para extrair um valor específico do JSON
-          host=$(echo $secret_value | jq -r '.HOST_DNS')
-          username=$(echo $secret_value | jq -r '.USERNAME')
-          ssh_key=$(echo $secret_value | jq -r '.EC2_SSH_KEY')
-          echo "HOST_DNS: $host"
-          echo "USERNAME: $username"
-          echo "EC2_SSH_KEY: $ssh_key"
