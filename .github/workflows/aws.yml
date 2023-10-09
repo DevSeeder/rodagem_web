@@ -14,7 +14,6 @@ jobs:
       - name: Get SSH Secrets
         run: |
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          echo "configure line 3"
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
 
           secret_value=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.SERVER_SECRET_NAME }} --region ${{ secrets.AWS_REGION }} --query SecretString --output text)
@@ -28,28 +27,35 @@ jobs:
           echo "SSH_PRIVATE_KEY=$SSH_PRIVATE_KEY" >> "$GITHUB_ENV"
         id: secrets_step
 
-      - name: Debug SSH_PRIVATE_KEY
-        run: echo ${{ env.SSH_PRIVATE_KEY }}
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
-      - name: Executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ env.SSH_HOST }}
-          username: ${{ env.SSH_USERNAME }}
-          key: ${{ env.SSH_PRIVATE_KEY }}
-          script_stop: true
-          all_envs: true
-          script: |
-            cd /var/www/instances/${{ secrets.TARGET_DIR }}
+      - name: Execute SSH Command
+        run: |
+          echo $SSH_HOST
+          echo $SSH_USERNAME
+          echo $SSH_PRIVATE_KEY
 
-            pm2 stop ${{ secrets.TARGET_DIR }}
+          chmod 600 private_key.pem
+          eval `ssh-agent -s`
+          ssh-add private_key.pem
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+          ssh -i private_key.pem $SSH_USERNAME@$SSH_HOST "ls -l"
 
-            sudo git checkout .
-            sudo git checkout master
-            sudo git pull
+          cd /var/www/instances/${{ secrets.TARGET_DIR }}
 
-            sudo npm install
-            sudo npm run build
+          pm2 stop ${{ secrets.TARGET_DIR }}
 
-            pm2 start ${{ secrets.TARGET_DIR }}
-            pm2 save
+          sudo git checkout .
+          sudo git checkout master
+          sudo git pull
+
+          sudo npm install
+          sudo npm run build
+
+          pm2 start ${{ secrets.TARGET_DIR }}
+          pm2 save
