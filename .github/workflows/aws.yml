@@ -45,7 +45,7 @@ jobs:
           echo $SSH_USERNAME
           echo $SSH_PRIVATE_KEY
 
-          chmod 777 private_key.pem
+          chmod 600 private_key.pem
           eval `ssh-agent -s`
           ssh-add private_key.pem
           ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
