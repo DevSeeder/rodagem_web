@@ -31,7 +31,6 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > private_key.pem
-          tail -c +4 private_key.pem > clean_private_key.pem
           chmod 600 private_key.pem
           ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
