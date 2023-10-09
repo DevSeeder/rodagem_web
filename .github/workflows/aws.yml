@@ -44,8 +44,8 @@ jobs:
 
           eval "$(ssh-agent -s)"
           echo "ssh age"
-
-          ssh-add ~/.ssh/private_key.pem
+          ll
+          ssh-add private_key.pem
           echo "ssh-add"
 
 
