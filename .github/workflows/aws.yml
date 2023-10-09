@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+
 jobs:
   deploy:
     name: Deploy to EC2 on master branch push
