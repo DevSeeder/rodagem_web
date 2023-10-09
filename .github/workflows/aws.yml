@@ -31,9 +31,11 @@ jobs:
         run: |
           mkdir -p ~/.ssh
 
-          echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
           ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+
+          echo "[$(cat private_key.pem)]""
 
       - name: Execute SSH Command
         run: |
