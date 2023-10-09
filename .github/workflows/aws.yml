@@ -35,7 +35,7 @@ jobs:
           chmod 600 private_key.pem
           ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
-          echo "[$(cat private_key.pem)]""
+          echo "[$(cat private_key.pem)]"
 
       - name: Execute SSH Command
         run: |
