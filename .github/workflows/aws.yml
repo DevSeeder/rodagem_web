@@ -41,7 +41,6 @@ jobs:
           # echo $SSH_USERNAME
           # echo $SSH_PRIVATE_KEY
 
-          chmod 600 private_key.pem
           echo "permissao"
 
           eval "$(ssh-agent -s)"
