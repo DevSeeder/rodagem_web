@@ -52,7 +52,6 @@ jobs:
             sudo npm install;
             sudo npm run build;
             
-            pm2 stop ${{ secrets.TARGET_DIR }};
-            pm2 start ${{ secrets.TARGET_DIR }};
+            pm2 restart ${{ secrets.TARGET_DIR }};
             pm2 save;
           "
