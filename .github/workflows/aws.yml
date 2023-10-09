@@ -44,6 +44,9 @@ jobs:
           chmod 600 private_key.pem
           eval `ssh-agent -s`
           ssh-add private_key.pem
+
+          file private_key.pem
+
           ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
           ssh -i private_key.pem $SSH_USERNAME@$SSH_HOST "ls -l"
 
