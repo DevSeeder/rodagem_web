@@ -23,9 +23,9 @@ jobs:
         run: |
           secret_value=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.SERVER_SECRET_NAME }} --region ${{ secrets.AWS_REGION }} --query SecretString --output text)
 
-          SSH_HOST=host=$(echo $secret_value | jq -r '.HOST_DNS')
-          SSH_USERNAME=host=$(echo $secret_value | jq -r '.USERNAME')
-          SSH_PRIVATE_KEY=host=$(echo $secret_value | jq -r '.EC2_SSH_KEY')
+          SSH_HOST=$(echo $secret_value | jq -r '.HOST_DNS')
+          SSH_USERNAME=$(echo $secret_value | jq -r '.USERNAME')
+          SSH_PRIVATE_KEY=$(echo $secret_value | jq -r '.EC2_SSH_KEY')
 
           echo $SSH_HOST
           echo $SSH_USERNAME
