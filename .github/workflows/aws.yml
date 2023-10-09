@@ -19,21 +19,31 @@ jobs:
           aws configure set aws_access_key_id $(cat aws_access_key_id)
           aws configure set aws_secret_access_key $(cat aws_secret_access_key)
 
+      - name: Get SSH Secrets
+        run: |
+          secret_value=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.SERVER_SECRET_NAME }} --region ${{ secrets.AWS_REGION }} --query SecretString --output text)
+
+          export SSH_HOST=host=$(echo $secret_value | jq -r '.HOST_DNS')
+          export SSH_USERNAME=host=$(echo $secret_value | jq -r '.USERNAME')
+          export SSH_PRIVATE_KEY=host=$(echo $secret_value | jq -r '.EC2_SSH_KEY')
+
       - name: Set up SSH
         run: |
-          mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
           ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
       - name: Execute SSH Command
         run: |
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-          ssh -i private_key.pem ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "ls -l"            echo ${{ secrets.SSH_HOST }}
-            
+          echo $SSH_PRIVATE_KEY
           echo ${{ secrets.SSH_HOST }}
           echo ${{ secrets.SSH_USERNAME }}
+          echo $SSH_USERNAME
           echo ${{ secrets.SSH_PRIVATE_KEY }}
+          echo $SSH_PRIVATE_KEY
+
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          ssh -i private_key.pem ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "ls -l"
 
           cd /var/www/instances/${{ secrets.TARGET_DIR }}
 
