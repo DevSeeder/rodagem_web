@@ -27,20 +27,16 @@ jobs:
           SSH_USERNAME=$(echo $secret_value | jq -r '.USERNAME')
           SSH_PRIVATE_KEY=$(echo $secret_value | jq -r '.EC2_SSH_KEY')
 
-          echo $SSH_HOST
-          echo $SSH_USERNAME
-          echo $SSH_PRIVATE_KEY
-
-          echo "::set-output name=SSH_HOST::$SSH_HOST"
-          echo "::set-output name=SSH_USERNAME::$SSH_USERNAME"
-          echo "::set-output name=SSH_PRIVATE_KEY::$SSH_PRIVATE_KEY"
+          echo "{SSH_HOST}={$SSH_HOST}" >> "$GITHUB_ENV"
+          echo "{SSH_USERNAME}={$SSH_USERNAME}" >> "$GITHUB_ENV"
+          echo "{SSH_PRIVATE_KEY}={$SSH_PRIVATE_KEY}" >> "$GITHUB_ENV"
         id: secrets_step
 
       - name: Set up SSH
         run: |
-          echo ${{ steps.my_step.outputs.SSH_HOST }}
-          echo ${{ steps.my_step.outputs.SSH_USERNAME }}
-          echo ${{ steps.my_step.outputs.SSH_PRIVATE_KEY }}
+          echo $SSH_HOST
+          echo $SSH_USERNAME
+          echo $SSH_PRIVATE_KEY
 
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > private_key.pem
@@ -49,12 +45,12 @@ jobs:
 
       - name: Execute SSH Command
         run: |
-          echo ${{ steps.my_step.outputs.SSH_HOST }}
-          echo ${{ steps.my_step.outputs.SSH_USERNAME }}
-          echo ${{ steps.my_step.outputs.SSH_PRIVATE_KEY }}
+          echo $SSH_HOST
+          echo $SSH_USERNAME
+          echo $SSH_PRIVATE_KEY
 
-          ssh-keyscan -H ${{ steps.my_step.outputs.SSH_HOST }} >> ~/.ssh/known_hosts
-          ssh -i private_key.pem ${{ steps.my_step.outputs.SSH_USERNAME }}@${{ steps.my_step.outputs.SSH_HOST }} "ls -l"
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+          ssh -i private_key.pem $SSH_USERNAME@$SSH_HOST "ls -l"
 
           cd /var/www/instances/${{ secrets.TARGET_DIR }}
 
