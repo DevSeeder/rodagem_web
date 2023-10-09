@@ -28,6 +28,9 @@ jobs:
           echo "SSH_PRIVATE_KEY=$SSH_PRIVATE_KEY" >> "$GITHUB_ENV"
         id: secrets_step
 
+      - name: Debug SSH_PRIVATE_KEY
+        run: echo ${{ env.SSH_PRIVATE_KEY }}
+
       - name: Executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@v0.1.9
         with:
