@@ -1,12 +1,27 @@
 .container {
-    max-width: 400px;
-    margin: auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 7%;
-  } 
+  display: flex;
+  max-width: 1200px;
+  margin: auto;
+  margin-top: 2%;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.formContainer,
+.mapContainer {
+  flex: 1;
+  padding: 20px;
+}
+
+.formContainer {
+  border-right: 1px solid #ccc;
+  max-width: 50%;
+}
+
+.mapContainer {
+  max-width: 50%;
+}
   
   .inputContainer {
     margin-bottom: 10px;

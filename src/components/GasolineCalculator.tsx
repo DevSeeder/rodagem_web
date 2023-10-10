@@ -142,81 +142,82 @@ const GasolineCalculator: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <Head>
-        <title>Calculadora de Gasolina</title>
-      </Head>
-      <h2>Rodagem - Calculadora de Gasolina</h2>
-      <div className={styles.inputContainer}>
-        <label className={styles.label}>
-          KM / Litro
-          <input
-            type="number"
-            value={kmPerLiter}
-            onChange={(e) => setKmPerLiter(e.target.value)}
-            className={styles.inputField}
-          />
-        </label>
-      </div>
-      <div className={styles.inputContainer}>
-        <label className={styles.label}>
-          Gasolina Preço por Litro (R$):
-          <input
-            type="number"
-            value={gasPrice}
-            onChange={(e) => setGasPrice(e.target.value)}
-            className={styles.inputField}
-          />
-        </label>
-      </div>
-      <div className={styles.inputContainer}>
-        <label className={styles.label}>
-          Origem:
-          <input
-            type="text"
-            value={origin}
-            onChange={handleOriginChange}
-            className={styles.inputField}
-          />
-          <ul className={styles.suggestions}>
-            {originSuggestions.map((place, index) => (
-              <li key={index} onClick={() => handleSuggestionClick(
-                  place, setOrigin, setOriginSuggestions, setOriginSelect
-                )}>
-                {place.description}
-              </li>
-            ))}
-          </ul>
-        </label>
-      </div>
-      <div className={styles.inputContainer}>
-        <label className={styles.label}>
-          Destino:
-          <input
-            type="text"
-            value={destination}
-            onChange={handleDestinationChange}
-            className={styles.inputField}
-          />
-          <ul className={styles.suggestions}>
-            {destinationSuggestions.map((place, index) => (
-              <li key={index} onClick={() => handleSuggestionClick(place, setDestination, setDestinationSuggestions, setDestSelect)}>
-                {place.description}
-              </li>
-            ))}
-          </ul>
-        </label>
-      </div>
-      <button onClick={handleButtonClick} className={styles.button}>
-        Calcular
-      </button>
-      {result !== null && (
-        <div className={styles.result}>
-          <h3>Custo da Viagem:</h3>
-          <p>R${result}</p>
+      <div className={styles.formContainer}>
+        <h1 style={{fontWeight: 'bold', fontSize: '15pt'}}>Rodagem - Calculadora de Gasolina</h1>
+        <br/>
+        <div className={styles.inputContainer}>
+          <label className={styles.label}>
+            KM / Litro
+            <input
+              type="number"
+              value={kmPerLiter}
+              onChange={(e) => setKmPerLiter(e.target.value)}
+              className={styles.inputField}
+            />
+          </label>
         </div>
-      )}
+        <div className={styles.inputContainer}>
+          <label className={styles.label}>
+            Gasolina Preço por Litro (R$):
+            <input
+              type="number"
+              value={gasPrice}
+              onChange={(e) => setGasPrice(e.target.value)}
+              className={styles.inputField}
+            />
+          </label>
+        </div>
+        <div className={styles.inputContainer}>
+          <label className={styles.label}>
+            Origem:
+            <input
+              type="text"
+              value={origin}
+              onChange={handleOriginChange}
+              className={styles.inputField}
+            />
+            <ul className={styles.suggestions}>
+              {originSuggestions.map((place, index) => (
+                <li key={index} onClick={() => handleSuggestionClick(
+                    place, setOrigin, setOriginSuggestions, setOriginSelect
+                  )}>
+                  {place.description}
+                </li>
+              ))}
+            </ul>
+          </label>
+        </div>
+        <div className={styles.inputContainer}>
+          <label className={styles.label}>
+            Destino:
+            <input
+              type="text"
+              value={destination}
+              onChange={handleDestinationChange}
+              className={styles.inputField}
+            />
+            <ul className={styles.suggestions}>
+              {destinationSuggestions.map((place, index) => (
+                <li key={index} onClick={() => handleSuggestionClick(place, setDestination, setDestinationSuggestions, setDestSelect)}>
+                  {place.description}
+                </li>
+              ))}
+            </ul>
+          </label>
+        </div>
+        <button onClick={handleButtonClick} className={styles.button}>
+          Calcular
+        </button>
+        {result !== null && (
+          <div className={styles.result}>
+            <h3>Custo da Viagem:</h3>
+            <p>R${result}</p>
+          </div>
+        )}
+      
+      </div>
       {origin && destination && (
-        <div style={{ height: '400px', width: '100%', marginTop: '20px' }}>
+        <div className={styles.mapContainer} style={{ height: '400px', width: '100%', marginTop: '20px' }}>
           <LoadScript googleMapsApiKey="AIzaSyA1jWfFTMpNv7SlxwaAQPphr3_ya8GqPh0">
             <GoogleMap
               mapContainerStyle={{ width: '100%', height: '100%' }}
