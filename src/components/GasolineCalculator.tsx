@@ -159,9 +159,7 @@ const GasolineCalculator: React.FC = () => {
 
       if (response.data && response.data.rows.length > 0 && response.data.rows[0].elements.length > 0) {
         return response.data.rows[0].elements[0].distance.value / 1000; // Em quilômetros
-      } else {
-        setRouteValid(false)
-      }
+      } 
     } catch (error) {
       console.error('Erro ao obter a distância:', error);
       throw error;
@@ -379,10 +377,20 @@ const GasolineCalculator: React.FC = () => {
                 callback={(res) => {
                   if(res?.routes.length === 0){
                     setDirections(null);
-                    setRouteValid(false);
+                    if(
+                      originValid &&
+                      destinationValid &&
+                      calcSelect &&
+                      destSelect &&
+                      originSelect
+                    ){
+                      console.log('invalid routes '+ origin + ' -> ' +destination);
+                      setRouteValid(false);
+                    }
                     return;
                   }
                   setDirections(res)
+                  setRouteValid(true)
                 }}
               />
               {originSelect && destSelect && directions && (
