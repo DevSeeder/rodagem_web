@@ -69,7 +69,7 @@ const GasolineCalculator: React.FC = () => {
   const searchPlaces = async (query: string, setSuggestions: React.Dispatch<React.SetStateAction<PlaceSuggestion[]>>): Promise<void> => {
     try {
       const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${query}&types=(cities)&key=AIzaSyA1jWfFTMpNv7SlxwaAQPphr3_ya8GqPh0`,
+        `/maps/maps/api/place/autocomplete/json?input=${query}&types=(cities)&key=AIzaSyA1jWfFTMpNv7SlxwaAQPphr3_ya8GqPh0`,
         {headers: {
           "Access-Control-Allow-Origin": "*"
         }}

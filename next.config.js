@@ -2,6 +2,14 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	async rewrites() {
+		return [
+			{
+				source: "/maps/:path*",
+				destination: "https://maps.googleapis.com/:path*",
+			},
+		];
+	},
 	async headers() {
 		console.log("here config next");
 		return [
