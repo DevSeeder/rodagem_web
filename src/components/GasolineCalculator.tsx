@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styles from '../styles/GasolineCalculator.module.css';
 import Head from 'next/head';
 import { GoogleMap, LoadScript, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import axios from 'axios';
-import { GET } from '@/core/route';
 
 interface PlaceSuggestion {
   description: string;
@@ -14,25 +13,55 @@ const GasolineCalculator: React.FC = () => {
   const [gasPrice, setGasPrice] = useState<string>('');
   const [origin, setOrigin] = useState<string>('');
   const [destination, setDestination] = useState<string>('');
+  const [center, setCenter] = useState<{lat: number, lng: number}>({lat: -34.397, lng: 150.644 });
   const [result, setResult] = useState<number>(0);
   const [originSuggestions, setOriginSuggestions] = useState<PlaceSuggestion[]>([]);
   const [destinationSuggestions, setDestinationSuggestions] = useState<PlaceSuggestion[]>([]);
+  const [directions, setDirections] = useState<any>(null);
+  const [originSelect, setOriginSelect] = useState<boolean>(false);
+  const [destSelect, setDestSelect] = useState<boolean>(false);
 
   const calculateGasCost = async (): Promise<void> => {
     const km: number = parseFloat(kmPerLiter);
     const price: number = parseFloat(gasPrice);
+    
 
-    if (!isNaN(km) && !isNaN(price) && origin && destination) {
-      const distance: number = await getDistance(origin, destination);
+
+    if (!isNaN(km) && !isNaN(price) && origin.length > 2 && destination.length > 2) {
+      const distance: number = await getDistance(origin, destination);      
       const cost: number = (distance / km) * price;
       setResult(Number(cost.toFixed(2)));
+      await getDirections(origin, destination);
     }
   };
 
-  const getDistance = async (origin: string, destination: string) => {
+  const getDirections = async (origin: string, destination: string) => {
+    try {      
+      setDirections(null); 
+      const response = await axios.get(
+        `/maps/maps/api/directions/json?origin=${origin}&destination=${destination}&key=AIzaSyA1jWfFTMpNv7SlxwaAQPphr3_ya8GqPh0`
+      );
+      const route = response.data.routes[0];
+      const bounds = route.bounds;
+      
+      // Obtendo o centro das coordenadas
+      const center = {
+        lat: (bounds.northeast.lat + bounds.southwest.lat) / 2,
+        lng: (bounds.northeast.lng + bounds.southwest.lng) / 2
+      };
+
+      setCenter(center);
+    } catch (error) {
+      console.error('Erro ao obter a distância:', error);
+      throw error;
+    }
+  };
+
+  const getDistance = async (origin: string, destination: string) => {    
+
     try {
       const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${origin}&destinations=${destination}&key=AIzaSyA1jWfFTMpNv7SlxwaAQPphr3_ya8GqPh0`
+        `maps/maps/api/distancematrix/json?units=metric&origins=${origin}&destinations=${destination}&key=AIzaSyA1jWfFTMpNv7SlxwaAQPphr3_ya8GqPh0`
       );
 
       if (response.data && response.data.rows.length > 0 && response.data.rows[0].elements.length > 0) {
@@ -46,9 +75,16 @@ const GasolineCalculator: React.FC = () => {
     }
   };
 
-  const handleOriginChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleOriginChange = (e: React.ChangeEvent<HTMLInputElement>): void => {    
+
     const value: string = e.target.value;
     setOrigin(value);
+    setOriginSelect(false);
+
+    if(value.length < 3){
+      return;
+    }
+
     if (value.trim() !== '') {
       searchPlaces(value, setOriginSuggestions);
     } else {
@@ -56,9 +92,16 @@ const GasolineCalculator: React.FC = () => {
     }
   };
 
-  const handleDestinationChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleDestinationChange = (e: React.ChangeEvent<HTMLInputElement>): void => {    
     const value: string = e.target.value;
+
     setDestination(value);
+    setDestSelect(false);
+
+    if(value.length < 3){
+      return;
+    }
+
     if (value.trim() !== '') {
       searchPlaces(value, setDestinationSuggestions);
     } else {
@@ -66,13 +109,11 @@ const GasolineCalculator: React.FC = () => {
     }
   };
 
-  const searchPlaces = async (query: string, setSuggestions: React.Dispatch<React.SetStateAction<PlaceSuggestion[]>>): Promise<void> => {
+  const searchPlaces = async (query: string, setSuggestions: React.Dispatch<React.SetStateAction<PlaceSuggestion[]>>): Promise<void> => {    
+
     try {
       const response = await axios.get(
-        `/maps/maps/api/place/autocomplete/json?input=${query}&types=(cities)&key=AIzaSyA1jWfFTMpNv7SlxwaAQPphr3_ya8GqPh0`,
-        {headers: {
-          "Access-Control-Allow-Origin": "*"
-        }}
+        `/maps/maps/api/place/autocomplete/json?input=${query}&types=(cities)&key=AIzaSyA1jWfFTMpNv7SlxwaAQPphr3_ya8GqPh0`
         );
 
       if (response.data.predictions) {
@@ -84,10 +125,15 @@ const GasolineCalculator: React.FC = () => {
     }
   };
 
-  const handleSuggestionClick = (place: PlaceSuggestion, 
-    setField: React.Dispatch<React.SetStateAction<string>>, setSuggestions: React.Dispatch<React.SetStateAction<PlaceSuggestion[]>>): void => {
+  const handleSuggestionClick = (
+    place: PlaceSuggestion, 
+    setField: React.Dispatch<React.SetStateAction<string>>, 
+    setSuggestions: React.Dispatch<React.SetStateAction<PlaceSuggestion[]>>,
+    setSelect: React.Dispatch<React.SetStateAction<boolean>>
+  ): void => {    
     setField(place.description);
     setSuggestions([]);
+    setSelect(true)
   };
 
   const handleButtonClick = (): void => {
@@ -133,7 +179,9 @@ const GasolineCalculator: React.FC = () => {
           />
           <ul className={styles.suggestions}>
             {originSuggestions.map((place, index) => (
-              <li key={index} onClick={() => handleSuggestionClick(place, setOrigin, setOriginSuggestions)}>
+              <li key={index} onClick={() => handleSuggestionClick(
+                  place, setOrigin, setOriginSuggestions, setOriginSelect
+                )}>
                 {place.description}
               </li>
             ))}
@@ -151,7 +199,7 @@ const GasolineCalculator: React.FC = () => {
           />
           <ul className={styles.suggestions}>
             {destinationSuggestions.map((place, index) => (
-              <li key={index} onClick={() => handleSuggestionClick(place, setDestination, setDestinationSuggestions)}>
+              <li key={index} onClick={() => handleSuggestionClick(place, setDestination, setDestinationSuggestions, setDestSelect)}>
                 {place.description}
               </li>
             ))}
@@ -172,18 +220,43 @@ const GasolineCalculator: React.FC = () => {
           <LoadScript googleMapsApiKey="AIzaSyA1jWfFTMpNv7SlxwaAQPphr3_ya8GqPh0">
             <GoogleMap
               mapContainerStyle={{ width: '100%', height: '100%' }}
-              center={{ lat: -34.397, lng: 150.644 }}
-              zoom={8}
+              zoom={12}
+              options={{
+                styles: [
+
+                ],
+              }}
+              center={center}
             >
               <DirectionsService
-                options={{
+                options={{ 
                   destination: destination,
                   origin: origin,
-                  travelMode: google.maps.TravelMode.DRIVING,
+                  travelMode: TravelMode.DRIVING,
                 }}
-                callback={() => {console.log('callback mapa')}}
+                callback={(res) => {
+                  setDirections(res)
+                }}
               />
-              <DirectionsRenderer />
+              {originSelect && destSelect && directions && (
+                <DirectionsRenderer 
+                  options={{
+                    directions: directions,
+                    markerOptions: {
+                      icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: 'black',
+                        fillOpacity: 1,
+                        scale: 5,
+                        strokeWeight: 0           
+                      }
+                    },
+                    polylineOptions: {
+                      strokeColor: '#000000', 
+                    },
+                  }}
+                />
+              )}
             </GoogleMap>
           </LoadScript>
         </div>
@@ -193,3 +266,10 @@ const GasolineCalculator: React.FC = () => {
 };
 
 export default GasolineCalculator;
+
+export enum TravelMode {
+  BICYCLING = 'BICYCLING',
+  DRIVING = 'DRIVING',
+  TRANSIT = 'TRANSIT',
+  WALKING = 'WALKING',
+}
