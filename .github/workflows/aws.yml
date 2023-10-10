@@ -16,7 +16,7 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
 
-          secret_value=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.SERVER_SECRET_NAME }} --region ${{ secrets.AWS_REGION }} --query SecretString --output text)
+          secret_value=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.PORTFOLIO_SERVER_SECRET_NAME }} --region ${{ secrets.AWS_REGION }} --query SecretString --output text)
 
           SSH_HOST=$(echo $secret_value | jq -r '.HOST_DNS')
           SSH_USERNAME=$(echo $secret_value | jq -r '.USERNAME')
