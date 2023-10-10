@@ -1,5 +1,6 @@
 .container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr;
   max-width: 1200px;
   margin: auto;
   margin-top: 1%;
@@ -10,17 +11,27 @@
 
 .formContainer,
 .mapContainer {
-  flex: 1;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 .formContainer {
   border-right: 1px solid #ccc;
-  max-width: 50%;
 }
 
 .mapContainer {
-  max-width: 50%;
+  order: 1; /* Alteração na ordem do grid para colocar o mapa abaixo em telas menores */
+}
+
+@media (min-width: 768px) {
+  .container {
+    grid-template-columns: 1fr 1fr;
+    align-items: start; /* Alinha os itens no início em telas maiores */
+  }
+
+  .formContainer {
+    order: 0; /* Alteração na ordem do grid para colocar o formulário primeiro em telas maiores */
+  }
 }
   
   .inputContainer {
