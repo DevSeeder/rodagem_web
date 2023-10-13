@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from '../styles/GasolineCalculator.module.css';
 import axios from 'axios';
-import { getSecret } from '@/adapter/secretManager';
+import '@tomtom-international/web-sdk-maps/dist/maps.css'
 
 const tomtomKey = 'XP89ank6XAEoPaABzg7XYtScbAp7OP1T';
 
@@ -105,7 +105,14 @@ const GasolineCalculator: React.FC = () => {
           map.removeLayer('routeLine')
         if(map.getSource('routeLine'))
           map.removeSource('routeLine')
-      }  
+      } 
+      
+      console.log('Origin Geo:', originGeo);
+      console.log('Destination Geo:', destinationGeo);
+      
+      new tt.Marker().setLngLat(lineCoordinates[0]).addTo(map);
+      new tt.Marker().setLngLat(lineCoordinates[lineCoordinates.length-1]).addTo(map);
+      
 
       map.addLayer({
         id: 'routeLine',
