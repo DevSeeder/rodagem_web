@@ -50,10 +50,6 @@ jobs:
             sudo git pull;
 
             # Lê o .env.sample e adiciona ao .env.local
-            echo file_content=$(cat .env.sample)
-            echo "Conteúdo do arquivo .env.sample:"
-            echo "$file_content"
-            echo "--- FIM DO CONTEUDO ---"
             while IFS= read -r line; do
               key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
                q="NEXT_PUBLIC_${key}" # Adiciona o prefixo
