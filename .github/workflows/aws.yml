@@ -50,24 +50,21 @@ jobs:
             sudo git pull;
 
             # Lê o .env.sample e adiciona ao .env.local
+            echo "Conteúdo do .env.sample:"
+            cat .env.sample
             while IFS= read -r line; do
+              key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
+              secret="NEXT_PUBLIC_${key}" # Adiciona o prefixo
+
               echo "Lendo linha: $line"
-              if [[ ! "$line" =~ ^\ *# && "$line" =~ .*= ]]; then
-                key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
-                secret="NEXT_PUBLIC_${key}" # Adiciona o prefixo
+              echo "Variável chave: $key"
+              echo "Secret gerado: $secret"
 
-                echo "Lendo linha: $line"
-                echo "Variável chave: $key"
-                echo "Secret gerado: $secret"
+              value=$(awk -F '=' -v var="$key" '$1 == var {print $2}' <<< "$secrets") # Obtém o valor do segredo do GitHub Actions
 
-                value=$(awk -F '=' -v var="$key" '$1 == var {print $2}' <<< "$secrets") # Obtém o valor do segredo do GitHub Actions
+              echo "Valor obtido: $value"
 
-                echo "Valor obtido: $value"
-
-                echo "$secret=$value" >> .env.local # Adiciona ao .env.local
-              else
-                echo "Linha ignorada: $line"
-              fi
+              echo "$secret=$value" >> .env.local # Adiciona ao .env.local
             done < .env.sample
 
 
