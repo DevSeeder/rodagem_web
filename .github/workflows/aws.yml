@@ -63,7 +63,7 @@ jobs:
               echo "Valor obtido: $value"
 
               echo "$secret=$value" >> .env.local # Adiciona ao .env.local
-            done < $(cat .env.sample)
+            done < $(sudo echo cat .env.sample)
 
 
             sudo npm install;
