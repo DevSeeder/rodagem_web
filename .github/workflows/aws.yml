@@ -51,6 +51,7 @@ jobs:
 
             # Lê o .env.sample e adiciona ao .env.local
             while IFS= read -r line; do
+              echo "Lendo linha: $line"
               if [[ ! "$line" =~ ^\ *# && "$line" =~ .*= ]]; then
                 key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
                 secret="NEXT_PUBLIC_${key}" # Adiciona o prefixo
