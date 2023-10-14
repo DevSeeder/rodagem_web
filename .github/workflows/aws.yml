@@ -49,6 +49,13 @@ jobs:
             sudo git checkout main;
             sudo git pull;
 
+            # Lê o .env.sample e adiciona ao .env.local
+            while IFS= read -r line; do
+              key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
+              secret="NEXT_PUBLIC_${key}" # Adiciona o prefixo
+              echo "$secret=${{ secrets[$secret] }}" >> .env.local # Adiciona ao .env.local
+            done < .env.sample
+
             sudo npm install;
             sudo npm run build;
             

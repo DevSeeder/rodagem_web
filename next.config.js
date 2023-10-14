@@ -6,7 +6,7 @@ const nextConfig = {
 		return [
 			{
 				source: "/maps/:path*",
-				destination: "https://maps.googleapis.com/:path*",
+				destination: "https://api.tomtom.com/:path*",
 			},
 		];
 	},
