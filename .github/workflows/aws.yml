@@ -53,7 +53,7 @@ jobs:
             while IFS= read -r line; do
               key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
               secret="NEXT_PUBLIC_${key}" # Adiciona o prefixo
-              value="${{ secrets[\"$secret\"] }}" # Obtém o valor do segredo do GitHub Actions
+              value="${{ secrets[\"$key\"] }}" # Obtém o valor do segredo do GitHub Actions
               echo "$secret=$value" >> .env.local # Adiciona ao .env.local
             done < .env.sample
 
