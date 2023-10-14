@@ -1,14 +1,23 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from 'react';
 import styles from '../styles/GasolineCalculator.module.css';
 import axios from 'axios';
 import '@tomtom-international/web-sdk-maps/dist/maps.css'
-
-const tomtomKey = 'XP89ank6XAEoPaABzg7XYtScbAp7OP1T';
+import { getSecret } from '@/adapter/secretManager';
 
 interface PlaceSuggestion {
   description: string;
   lat: number;
   lon: number;
+}
+
+export interface RouteResponse {
+  legs: Array<{
+    points: Array<{
+      latitude: number;
+      longitude: number;
+    }>
+  }>
 }
 
 interface PlaceGeo {
@@ -37,28 +46,23 @@ const GasolineCalculator: React.FC = () => {
   const [originSelect, setOriginSelect] = useState<boolean>(false);
   const [destSelect, setDestSelect] = useState<boolean>(false);
   const [routeValid, setRouteValid] = useState<boolean>(true);
+  const [apiKey, setApiKey] = useState('');
 
   const mapElement = useRef(null);
-  const [mapZoom, setMapZoom] = useState(13);
-  const [route, setRoute] = useState(null);
+  const [route, setRoute] = useState<RouteResponse | null>(null);
   const [map, setMap] = useState<tt.Map| null>(null);
   let firstRender = true;
 
   useEffect(() => {
-
-    console.log('useEffect');
-    console.log(map);
     if (!mapElement.current || !firstRender) return;
-
     firstRender = false;
-    
-    console.log('---- useEffect ----');
-
+  
     const initTT = async () => {
-      console.log('initTT');
+      const tomtomKey = await getSecret(process.env.NEXT_PUBLIC_TOMTOM_API_SECRET_NAME!);
+      setApiKey(apiKey);
       const tt = await import('@tomtom-international/web-sdk-maps');
       const script = document.createElement('script');
-      script.src = `https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.14.0/maps/maps-web.min.js?key=${tomtomKey}`;
+      script.src = `/maps/maps-sdk-for-web/cdn/6.x/6.14.0/maps/maps-web.min.js?key=${tomtomKey}`;
       script.async = true;
       script.onload = () => {
         const mapInstance = tt.map({
@@ -85,8 +89,6 @@ const GasolineCalculator: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log('effect route')
-
     const drawRoute = async () => {
 
       if(!map || !route || !route.legs.length) return;
@@ -106,12 +108,9 @@ const GasolineCalculator: React.FC = () => {
         if(map.getSource('routeLine'))
           map.removeSource('routeLine')
       } 
-      
-      console.log('Origin Geo:', originGeo);
-      console.log('Destination Geo:', destinationGeo);
-      
-      new tt.Marker().setLngLat(lineCoordinates[0]).addTo(map);
-      new tt.Marker().setLngLat(lineCoordinates[lineCoordinates.length-1]).addTo(map);
+            
+      new tt.Marker().setLngLat(lineCoordinates[0] as tt.LngLatLike).addTo(map);
+      new tt.Marker().setLngLat(lineCoordinates[lineCoordinates.length-1]  as tt.LngLatLike).addTo(map);
       
 
       map.addLayer({
@@ -152,44 +151,44 @@ const GasolineCalculator: React.FC = () => {
     if (map && route) {
       drawRoute();
     }
-  }, [map, route]);
+  }, [calcSelect, destinationGeo, map, originGeo, route]);
   
 
 
-  // useEffect(() => {
-  //   const handleClickOutside = (event: any) => {
-  //     const originInput = document.getElementById('origin-input');
-  //     const destinationInput = document.getElementById('destination-input');
-  //     const origSug = document.getElementById('origin-suggestion');
-  //     const destSug = document.getElementById('destination-suggestion');
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      const originInput = document.getElementById('origin-input');
+      const destinationInput = document.getElementById('destination-input');
+      const origSug = document.getElementById('origin-suggestion');
+      const destSug = document.getElementById('destination-suggestion');
 
-  //     if (
-  //       originInput &&
-  //       !originInput.contains(event.target) &&
-  //       destinationInput &&
-  //       !destinationInput.contains(event.target) &&
-  //       origSug &&
-  //       !origSug.contains(event.target) &&
-  //       destSug &&
-  //       !destSug.contains(event.target)
-  //     ) {
-  //       if (originSuggestions.length > 0) {
-  //         setOriginValid(false);
-  //       }
-  //       if (destinationSuggestions.length > 0) {
-  //         setDestinationValid(false);
-  //       }
-  //       setOriginSuggestions([]);
-  //       setDestinationSuggestions([]);
-  //     }
-  //   };
+      if (
+        originInput &&
+        !originInput.contains(event.target) &&
+        destinationInput &&
+        !destinationInput.contains(event.target) &&
+        origSug &&
+        !origSug.contains(event.target) &&
+        destSug &&
+        !destSug.contains(event.target)
+      ) {
+        if (originSuggestions.length > 0) {
+          setOriginValid(false);
+        }
+        if (destinationSuggestions.length > 0) {
+          setDestinationValid(false);
+        }
+        setOriginSuggestions([]);
+        setDestinationSuggestions([]);
+      }
+    };
 
-  //   document.addEventListener('click', handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
 
-  //   return () => {
-  //     document.removeEventListener('click', handleClickOutside);
-  //   };
-  // }, [destinationSuggestions.length, originSuggestions.length]);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [destinationSuggestions.length, originSuggestions.length]);
 
   const validateFields = () => {
     let isValid = true;
@@ -241,18 +240,20 @@ const GasolineCalculator: React.FC = () => {
     try {
 
       const response = await axios.get(
-        `https://api.tomtom.com/routing/1/calculateRoute/${originGeo?.lat},${originGeo?.long}:${destinationGeo?.lat},${destinationGeo?.long}/json?key=${tomtomKey}&routeType=fastest&traffic=true`
+        `/maps/routing/1/calculateRoute/${originGeo?.lat},${originGeo?.long}:${destinationGeo?.lat},${destinationGeo?.long}/json?key=${apiKey}&routeType=fastest&traffic=true`
       );
 
-      console.log('Distance');
-      console.log(response);
-
       if (response.data && response.data.routes && response.data.routes[0].summary) {
-        console.log('setRoute');
         setRoute(response.data.routes[0]);
         return response.data.routes[0].summary.lengthInMeters / 1000;
       }
     } catch (error) {
+
+      if((error as any).response.data.detailedError.code === 'NO_ROUTE_FOUND'){
+        setRouteValid(false);
+        return;
+      }
+
       console.error('Erro ao obter a distância:', error);
       throw error;
     }
@@ -297,7 +298,7 @@ const GasolineCalculator: React.FC = () => {
   ): Promise<void> => {
     try {
       const response = await axios.get(
-        `https://api.tomtom.com/search/2/search/${query}.json?key=${tomtomKey}`
+        `/maps/search/2/search/${query}.json?key=${apiKey}`
       );
 
       if (response.data.results) {
