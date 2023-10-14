@@ -50,9 +50,10 @@ jobs:
             sudo git pull;
 
             # Lê o .env.sample e adiciona ao .env.local
-            file_content=$(echo head -n -0 .env.sample)
+            echo file_content=$(cat .env.sample)
             echo "Conteúdo do arquivo .env.sample:"
             echo "$file_content"
+            echo "--- FIM DO CONTEUDO ---"
             while IFS= read -r line; do
               key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
                q="NEXT_PUBLIC_${key}" # Adiciona o prefixo
@@ -66,7 +67,7 @@ jobs:
               echo "Valor obtido: $value"
 
               echo "$secret=$value" >> .env.local # Adiciona ao .env.local
-            done < $file_content
+            done < $(cat .env.sample)
 
 
             sudo npm install;
