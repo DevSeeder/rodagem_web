@@ -51,6 +51,7 @@ jobs:
 
             # Lê o .env.sample e adiciona ao .env.local
             while IFS= read -r line; do
+              if [[ ! "$line" =~ ^\ *# && "$line" =~ .*= ]]; then
                 key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
                 secret="NEXT_PUBLIC_${key}" # Adiciona o prefixo
 
@@ -65,7 +66,9 @@ jobs:
                 echo "Valor obtido: $value"
 
                 echo "$secret=$value" >> .env.local # Adiciona ao .env.local
+              fi
             done < .env.sample
+
 
             sudo npm install;
             sudo npm run build;
