@@ -53,11 +53,15 @@ jobs:
             while IFS= read -r line; do
                 key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
                 secret="NEXT_PUBLIC_${key}" # Adiciona o prefixo
+
+                # Adicionando logs para debug
+                echo "Lendo linha: $line"
+                echo "Variável chave: $key"
+                echo "Secret gerado: $secret"
+
                 value=$(awk -F '=' -v var="$key" '$1 == var {print $2}' <<< "$secrets") # Obtém o valor do segredo do GitHub Actions
 
-                # Adicionando logs
-                echo "Lendo variável: $key"
-                echo "Secret gerado: $secret"
+                # Adicionando logs para debug
                 echo "Valor obtido: $value"
 
                 echo "$secret=$value" >> .env.local # Adiciona ao .env.local
