@@ -18,11 +18,10 @@ jobs:
 
           secret_value=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.PORTFOLIO_SERVER_SECRET_NAME }} --region ${{ secrets.AWS_REGION }} --query SecretString --output text)
 
-          SSH_HOST=$(echo $secret_value | jq -r '.HOST_DNS')
           SSH_USERNAME=$(echo $secret_value | jq -r '.USERNAME')
           SSH_PRIVATE_KEY=$(echo $secret_value | jq -r '.EC2_SSH_KEY')
 
-          echo "SSH_HOST=$SSH_HOST" >> "$GITHUB_ENV"
+          echo "SSH_HOST=${{ secrets.HOST_DNS }}" >> "$GITHUB_ENV"
           echo "SSH_USERNAME=$SSH_USERNAME" >> "$GITHUB_ENV"
           echo "SSH_PRIVATE_KEY=$SSH_PRIVATE_KEY" >> "$GITHUB_ENV"
         id: secrets_step
@@ -61,7 +60,7 @@ jobs:
 
 
             sudo npm install;
-            sudo node --max_old_space_size=8192 node_modules/.bin/next build;
+            sudo npm run build;
             
             pm2 restart ${{ secrets.TARGET_DIR }};
             pm2 save;
