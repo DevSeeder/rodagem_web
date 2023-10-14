@@ -50,20 +50,14 @@ jobs:
             sudo git pull;
 
             # Lê o .env.sample e adiciona ao .env.local
-            while IFS= read -r line; do
-              key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
-               q="NEXT_PUBLIC_${key}" # Adiciona o prefixo
-
-              echo "Lendo linha: $line"
-              echo "Variável chave: $key"
-              echo "Secret gerado: $secret"
-
-              value=$(awk -F '=' -v var="$key" '$1 == var {print $2}' <<< "$secrets") # Obtém o valor do segredo do GitHub Actions
-
-              echo "Valor obtido: $value"
-
-              echo "$secret=$value" >> .env.local # Adiciona ao .env.local
-            done < $(sudo echo cat .env.sample)
+            if [ -f .env.local ]; then
+              rm .env.local
+              echo "Arquivo .env.local apagado com sucesso!"
+            fi
+            echo "NEXT_PUBLIC_AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" > .env.local
+            echo "NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env.local
+            echo "NEXT_PUBLIC_AWS_REGION=${{ secrets.AWS_REGION }}" >> .env.local
+            echo "NEXT_PUBLIC_TOMTOM_API_SECRET_NAME=${{ secrets.TOMTOM_API_SECRET_NAME }}" >> .env.local
 
 
             sudo npm install;
