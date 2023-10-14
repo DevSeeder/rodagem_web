@@ -56,11 +56,17 @@ const GasolineCalculator: React.FC = () => {
   useEffect(() => {
     if (!mapElement.current || !firstRender) return;
     firstRender = false;
+
+    const setKey = async () => {
+      const tomtomKey = await getSecret(process.env.NEXT_PUBLIC_TOMTOM_API_SECRET_NAME!);
+      await setApiKey(tomtomKey);
+      return tomtomKey;
+    }
   
     const initTT = async () => {
-      const tomtomKey = await getSecret(process.env.NEXT_PUBLIC_TOMTOM_API_SECRET_NAME!);
-      setApiKey(apiKey);
       const tt = await import('@tomtom-international/web-sdk-maps');
+      const tomtomKey = await setKey();
+      await setApiKey(tomtomKey);
       const script = document.createElement('script');
       script.src = `/maps/maps-sdk-for-web/cdn/6.x/6.14.0/maps/maps-web.min.js?key=${tomtomKey}`;
       script.async = true;
