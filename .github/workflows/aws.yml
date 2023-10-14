@@ -52,8 +52,11 @@ jobs:
             # Lê o .env.sample e adiciona ao .env.local
             while IFS= read -r line; do
               key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
+              echo "KEY ---> ${key}"
               secret="NEXT_PUBLIC_${key}" # Adiciona o prefixo
               value=$(awk -F '=' -v var="$key" '$1 == var {print $2}' <<< "$secrets") # Obtém o valor do segredo do GitHub Actions
+              echo "secret ---> ${secret}"
+              echo "value ---> ${value}"
               echo "$secret=$value" >> .env.local # Adiciona ao .env.local
             done < .env.sample
 
