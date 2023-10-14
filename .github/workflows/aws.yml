@@ -61,7 +61,7 @@ jobs:
 
 
             sudo npm install;
-            sudo npm run build;
+            sudo node --max_old_space_size=8192 node_modules/.bin/next build;
             
             pm2 restart ${{ secrets.TARGET_DIR }};
             pm2 save;
