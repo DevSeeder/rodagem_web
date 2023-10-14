@@ -53,7 +53,8 @@ jobs:
             while IFS= read -r line; do
               key=$(echo "$line" | cut -d'=' -f1) # Extrai o nome da variável
               secret="NEXT_PUBLIC_${key}" # Adiciona o prefixo
-              echo "$secret=${{ secrets[$secret] }}" >> .env.local # Adiciona ao .env.local
+              value="${{ secrets[\"$secret\"] }}" # Obtém o valor do segredo do GitHub Actions
+              echo "$secret=$value" >> .env.local # Adiciona ao .env.local
             done < .env.sample
 
             sudo npm install;
